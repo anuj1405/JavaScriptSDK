@@ -8,7 +8,7 @@ module.exports = function(grunt) {
                 // the files to concatenate
                     src: ['src/Promises.js','src/PrivateMethods.js','src/CloudApp.js','src/ACL.js','src/CloudNotifications.js','src/CloudObject.js','src/CloudQuery.js','src/CloudSearch.js'
                     ,'src/CloudUser.js','src/CloudRole.js','src/CloudFile.js','src/CloudGeoPoint.js', 'src/CloudTable.js', 'src/Column.js','src/CloudQueue.js',
-                    'src/CloudCache.js'],
+                    'src/CloudCache.js','src/CloudSync.js'],
                     // the location of the resulting JS file
                     dest: 'dist/cloudboost.js'
                 },
@@ -21,6 +21,7 @@ module.exports = function(grunt) {
                         'test/requireCloudBoost.js',
                         'test/init/init.js',
                         'test/CloudCache/*.js',
+                        'test/CloudSync/*.js',
                         'test/CloudTable/*.js',
                         'test/CloudQueue/*.js',
                         'test/CloudObject/*.js',

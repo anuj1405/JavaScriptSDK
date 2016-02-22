@@ -53,7 +53,7 @@ CB.CloudCache.prototype.set = function(key, value, callback){
     if(CB._isJsonString(response)){
       response = JSON.parse(response);
     }
-    
+
     var obj = CB.fromJSON(response);
     if (callback) {
         callback.success(obj);
@@ -90,7 +90,7 @@ CB.CloudCache.prototype.deleteItem = function(key, callback){
     if(CB._isJsonString(response)){
       response = JSON.parse(response);
     }
-    
+
     var obj = CB.fromJSON(response);
     if (callback) {
         callback.success(obj);

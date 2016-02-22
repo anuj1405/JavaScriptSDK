@@ -1,4 +1,5 @@
-var SECURE_KEY = "0824ff47-252e-4828-8bfd-1feddb659b24";
+// var SECURE_KEY = "0824ff47-252e-4828-8bfd-1feddb659b24";
+var SECURE_KEY = "d51547b1-22cc-4b44-bd0f-7d0de1c2bc95";
 var URL = "http://localhost:4730";
 
    var util = {
@@ -672,6 +673,164 @@ describe("Cloud Cache", function(){
             }
         });
     });
+});
+
+describe("Cloud Sync", function(){
+
+   before(function(){
+      CB.appKey = CB.masterKey;
+   });
+
+   it("Should not insert a null table", function(done){
+      this.timeout(300000);
+      try{
+        var offlineSync = new CB.CloudSync('');
+        done('Added an null table');
+      }catch(e){
+        done();
+      }
+   });
+
+   it("Should add an item to the Offline Sync", function(done){
+      this.timeout(300000);
+      var offlineSync = new CB.CloudSync('Name');
+      var data ={_id: new Date().toISOString(),name:'Buhiire Keneth', age:25};
+      offlineSync.put(data, {
+        success: function(result){
+            if(result != null){
+                console.log(result);
+                done();
+            }else{
+                done('Added invalid data');
+            }
+            // done();
+
+        },error:function(err){
+            console.log(err);
+            done(err);
+        }
+      });
+   });
+
+   it("Should get the name of the Offline Sync", function(done){
+      this.timeout(300000);
+      var offlineSync = new CB.CloudSync('Name');
+      var data ={_id: new Date().toISOString(),name:'Buhiire Keneth', age:25};
+      offlineSync.put(data, {
+        success: function(result){
+          console.log(offlineSync);
+            if(result != null){
+                if(offlineSync.document.name ==='Name'){
+                  done();
+                }else{
+                  done('Could Not fetch the name');
+                }
+            }else{
+                done('Added invalid data');
+            }
+            // done();
+
+        },error:function(err){
+            console.log(err);
+            done(err);
+        }
+      });
+   });
+
+
+   it("Should get a single item from the Offline Sync", function(done){
+      this.timeout(300000);
+      var offlineSync = new CB.CloudSync(util.makeString());
+      var data = {_id: 'test1', name:'Buhiire Keneth', age:26};
+      offlineSync.put(data,{
+        success: function(result){
+          if(result != null){
+              offlineSync.get(result, {
+                success: function(response){
+                   if(!response === null){
+                       done();
+                   }else{
+                      done("Invalid response");
+                   }
+                }, error: function(err){
+                  done(err);
+                }
+              });
+          }else{
+            console.log(result);
+              done("Invalid data");
+          }
+        }
+      });
+   });
+
+   it("Should get all the items stored in a single OfflineSync", function(done){
+      this.timeout(300000);
+      var offlineSync = new CB.CloudSync(util.makeString());
+      var data = {_id: 'test1', name:'Buhiire Keneth', age:26};
+      offlineSync.put(data,{
+        success: function(result){
+          if(result != null){
+              offlineSync.get(result, {
+                success: function(response){
+                   if(response != null){
+                       offlineSync.getAll({
+                        success: function(result){
+                          console.log(result);
+                          done();
+                           // if(result != null){
+                           //   done();
+                           // }else{
+                           //   done("Invalid data");
+                           // }
+                        }, error: function(err){
+                          done(err);
+                        }
+                       });
+                   }else{
+                      done("Invalid response");
+                   }
+                }, error: function(err){
+                  done(err);
+                }
+              });
+          }else{
+            console.log(result);
+              done("Invalid data");
+          }
+        }
+      });
+   });
+
+   it("Should delete an item from the offlineSync", function(done){
+    this.timeout(300000);
+    var offlineSync = new CB.CloudSync(util.makeString());
+    var data = {_id: new Date().toISOString(), name:'Buhiire Keneth', age:26};
+    offlineSync.put(data, {
+        success: function(result){
+            if(result !=null){
+                console.log(result);
+                offlineSync.remove(result,{
+                  success: function(response){
+                      if(response !=null){
+                        done();
+                      }else{
+                        done('Invalid response');
+                      }
+                  }, error: function(err){
+                    console.log(err);
+                    done(err);
+                  }
+                });
+            }else{
+                done('Added invalid data');
+            }
+        }, error: function(err){
+          console.log(err);
+          done(err);
+        }
+    });
+   });
 });
 
 describe("Cloud Table", function(){
@@ -1829,9 +1988,9 @@ describe("Table Tests", function (done) {
 });
 describe("Cloud Queue Tests", function() {
 
-	//Use Sample Table. 
-	// -> Which has columns : 
-	// name : string : required
+	Use Sample Table.
+	-> Which has columns :
+	name : string : required
 
  it("Should add data into the Queue",function(done){
 
@@ -1958,7 +2117,7 @@ describe("Cloud Queue Tests", function() {
           queue.updateMessage('sample',{
                success : function(response){
                     done("Updated unsaved data");
-                         
+
                },error : function(error){
                     done(error);
                }
@@ -2015,11 +2174,11 @@ describe("Cloud Queue Tests", function() {
      queue.addMessage(['sample','sample2'],{
      	success : function(response){
      		if(response.constructor === Array && response.length === 2 && response[0] instanceof CB.QueueMessage && response[0].id && response[1] instanceof CB.QueueMessage && response[1].id){
-     			//addMessage again. 
+     			//addMessage again.
      			 queue.addMessage(['sample','sample2'],{
 			     	success : function(response){
 			     		if(response.constructor === Array && response.length === 2 && response[0] instanceof CB.QueueMessage && response[0].id && response[1] instanceof CB.QueueMessage && response[1].id){
-			     			//addMessage again. 
+			     			//addMessage again.
 			     			done();
 			     		}else{
 			     			done("Message added but response is not QueueMessage");
@@ -2081,7 +2240,7 @@ it("Should add and get data from the queue.",function(done){
           success : function(response){
                if(response instanceof CB.QueueMessage && response.id){
                     if(response.message === 'sample'){
-                         //now getMessage it. 
+                         //now getMessage it.
                          queue.getMessage({
                               success : function(message){
                                    if(message.message === 'sample'){
@@ -2115,11 +2274,11 @@ it("Should peek.",function(done){
           success : function(response){
                if(response instanceof CB.QueueMessage && response.id){
                     if(response.message === 'sample'){
-                         //now getMessage it. 
+                         //now getMessage it.
                          queue.peekMessage({
                               success : function(message){
                                    if(message.message === 'sample'){
-                                       //peekMessage again. 
+                                       //peekMessage again.
                                        queue.peekMessage({
                                              success : function(message){
                                                   if(message.message === 'sample'){
@@ -2164,7 +2323,7 @@ it("Should get the messages in FIFO",function(done){
                               success : function(response){
                                    if(response instanceof CB.QueueMessage && response.id){
                                         if(response.message === 'sample2'){
-                                             //now getMessage it. 
+                                             //now getMessage it.
                                              queue.getMessage({
                                                   success : function(message){
                                                        if(message.message === 'sample1'){
@@ -2182,7 +2341,7 @@ it("Should get the messages in FIFO",function(done){
                                                        done(error);
                                                   }
                                              });
-                                            
+
                                         }
                                         else{
                                              done("Added but incorrect data");
@@ -2194,7 +2353,7 @@ it("Should get the messages in FIFO",function(done){
                                    done(error);
                               }
                          });
-                        
+
                     }
                     else{
                          done("Added but incorrect data");
@@ -2225,7 +2384,7 @@ it("Should peek 2 messages at the same time.",function(done){
                               success : function(response){
                                    if(response instanceof CB.QueueMessage && response.id){
                                         if(response.message === 'sample2'){
-                                             //now getMessage it. 
+                                             //now getMessage it.
                                              queue.peekMessage(2, {
                                                   success : function(messages){
                                                       if(messages.length ===2 && messages[0].id && messages[1].id){
@@ -2277,7 +2436,7 @@ it("Should get 2 messages at the same time.",function(done){
                               success : function(response){
                                    if(response instanceof CB.QueueMessage && response.id){
                                         if(response.message === 'sample2'){
-                                             //now getMessage it. 
+                                             //now getMessage it.
                                              queue.getMessage(2, {
                                                   success : function(messages){
                                                       if(messages.length ===2 && messages[0].id && messages[1].id){
@@ -2287,7 +2446,7 @@ it("Should get 2 messages at the same time.",function(done){
                                                        done(error);
                                                   }
                                              });
-                                            
+
                                         }
                                         else{
                                              done("Add but incorrect data");
@@ -2299,7 +2458,7 @@ it("Should get 2 messages at the same time.",function(done){
                                    done(error);
                               }
                          });
-                        
+
                     }
                     else{
                          done("Added but incorrect data");
@@ -2326,7 +2485,7 @@ it("Should not getMessage message with the delay ",function(done){
           success : function(response){
                if(response instanceof CB.QueueMessage && response.id){
                     if(response.message === 'sample'){
-                         //now getMessage it. 
+                         //now getMessage it.
                          queue.getMessage({
                               success : function(message){
                                    if(!message){
@@ -2377,14 +2536,14 @@ it("Should not getMessage message with the delay ",function(done){
                success : function(response){
                     if(response instanceof CB.QueueMessage && response.id){
                          if(response.message === 'sample'){
-                              //now getMessage it. 
+                              //now getMessage it.
                               queue.getMessage({
                                    success : function(message){
                                         if(message){
                                               queue.getMessage({
                                                   success : function(message){
                                                        if(!message){
-                                                           done(); 
+                                                           done();
                                                        }else{
                                                             done("Got a message.")
                                                        }
@@ -2422,7 +2581,7 @@ it("Should not getMessage message with the delay ",function(done){
                success : function(response){
                     if(response instanceof CB.QueueMessage && response.id){
                          if(response.message === 'sample'){
-                              //now getMessage it. 
+                              //now getMessage it.
 
                                queue.getMessage({
                                         success : function(message){
@@ -2451,8 +2610,8 @@ it("Should not getMessage message with the delay ",function(done){
                                              done(error);
                                         }
                                    });
-                              
-                             
+
+
                          }
                          else{
                               done("added but incorrect data");
@@ -2476,7 +2635,7 @@ it("Should not getMessage message with the delay ",function(done){
                success : function(response){
                     if(response instanceof CB.QueueMessage && response.id){
                          if(response.message === 'sample'){
-                              //now getMessage it. 
+                              //now getMessage it.
                               setTimeout(function(){
                                    queue.getMessage({
                                         success : function(message){
@@ -2490,7 +2649,7 @@ it("Should not getMessage message with the delay ",function(done){
                                         }
                                    });
                               },2000);
-                             
+
                          }
                          else{
                               done("added but incorrect data");
@@ -2515,8 +2674,8 @@ it("Should not getMessage message with the delay ",function(done){
                success : function(response){
                     if(response instanceof CB.QueueMessage && response.id){
                          if(response.message === 'sample'){
-                              //now getMessage it. 
-                              
+                              //now getMessage it.
+
                               queue.getMessageById(response.id,{
                                    success : function(message){
                                         if(message.message = 'sample'){
@@ -2551,8 +2710,8 @@ it("Should not getMessage message with the delay ",function(done){
                success : function(response){
                     if(response instanceof CB.QueueMessage && response.id){
                          if(response.message === 'sample'){
-                              //now getMessage it. 
-                              
+                              //now getMessage it.
+
                               queue.getMessageById("sample",{
                                    success : function(message){
                                         if(!message){
@@ -2587,8 +2746,8 @@ it("Should not getMessage message with the delay ",function(done){
                success : function(response){
                     if(response instanceof CB.QueueMessage && response.id){
                          if(response.message === 'sample'){
-                              //now getMessage it. 
-                              
+                              //now getMessage it.
+
                               queue.deleteMessage(response.id,{
                                    success : function(message){
                                         if(message!=null && message.id === response.id){
@@ -2624,8 +2783,8 @@ it("Should not getMessage message with the delay ",function(done){
                success : function(response){
                     if(response instanceof CB.QueueMessage && response.id){
                          if(response.message === 'sample'){
-                              //now getMessage it. 
-                              
+                              //now getMessage it.
+
                               queue.deleteMessage(response,{
                                    success : function(message){
                                         if(message!=null && message.id === response.id){
@@ -2661,12 +2820,12 @@ it("Should not getMessage message with the delay ",function(done){
                success : function(response){
                     if(response instanceof CB.QueueMessage && response.id){
                          if(response.message === 'sample'){
-                              //now getMessage it. 
-                              
+                              //now getMessage it.
+
                               queue.deleteMessage(response,{
                                    success : function(message){
                                         if(message!=null && message.id === response.id){
-                                             
+
                                              queue.getMessageById(response.id, {
                                                   success : function(message){
                                                       if(!message)
@@ -2818,23 +2977,23 @@ it("Should not getMessage message with the delay ",function(done){
           queue.addMessage("sample",{
                success : function(response){
                    if(response.id){
-                       //now delete the queue. 
+                       //now delete the queue.
                        queue.delete({
                               success : function(response){
                                   if(response.name){
-                                        //getMessage message from the queue. 
+                                        //getMessage message from the queue.
                                         queue.getMessage({
                                              success : function(response){
                                                  if(response.id){
                                                       done("get message from the queue which is deleted.");
-                                                 }else{     
+                                                 }else{
                                                     done("get message from deleted queue.");
                                                  }
                                              },error : function(error){
                                                  done();
                                              }
                                         });
-                                  }else{     
+                                  }else{
                                      done("Failed to delete the queue.");
                                   }
                               },error : function(error){
@@ -2850,29 +3009,97 @@ it("Should not getMessage message with the delay ",function(done){
           });
      });
 
+      it("Should create a queue, and  delete the queue", function(done){
+          this.timeout(30000);
+          var name = util.makeString();
+          var queue = new CB.CloudQueue(name);
+          queue.create({
+          success : function(response){
+               if(response instanceof CB.CloudQueue && response.name){
+                    if(response.name === name && response.createdAt && response.updatedAt){
+                         done();
+                         queue.delete({
+                              success: function(response){
+                                   console.log(response);
+                                   done();
+                              }, error: function(error){
+                                   console.log(error);
+                                   done("Error");
+                              }
+                         });
+                    }
+                    else{
+                         done("Incorrect data");
+                    }
+               }else{
+                    done("Didnot create queue");
+               }
+          },error : function(error){
+               done(error);
+          }
+        });
+      });
+
+      it("Should create a queue, add a message and delete the queue", function(done){
+          this.timeout(30000);
+          var queue = new CB.CloudQueue(util.makeString());
+          queue.addMessage("sample",{
+               success : function(response){
+                   if(response.id){
+                       //now delete the queue.
+                       queue.delete({
+                              success : function(response){
+                                  if(response.name){
+                                        //getMessage message from the queue.
+                                        queue.getMessage({
+                                             success : function(response){
+                                                 if(response.id){
+                                                      done("get message from the queue which is deleted.");
+                                                 }else{
+                                                    done("get message from deleted queue.");
+                                                 }
+                                             },error : function(error){
+                                                 done();
+                                             }
+                                        });
+                                  }else{
+                                     done("Failed to delete the queue.");
+                                  }
+                              },error : function(error){
+                                  done("Failed to add a subscriber");
+                              }
+                         });
+                   }else{
+                      done("Failed to add the message.");
+                   }
+               },error : function(error){
+                   done("Failed to add a subscriber");
+               }
+          });
+      });
      it("Should clear the queue.",function(done){
           this.timeout(30000);
           var queue = new CB.CloudQueue(util.makeString());
           queue.addMessage("sample",{
                success : function(response){
                    if(response.id){
-                       //now delete the queue. 
+                       //now delete the queue.
                        queue.clear({
                               success : function(response){
                                   if(response.name){
-                                        //getMessage message from the queue. 
+                                        //getMessage message from the queue.
                                         queue.getMessage({
                                              success : function(response){
                                                  if(response){
                                                       done("get message from the queue which is deleted.");
-                                                 }else{     
+                                                 }else{
                                                     done();
                                                  }
                                              },error : function(error){
                                                  done("Error getting data");
                                              }
                                         });
-                                  }else{     
+                                  }else{
                                      done("Failed to delete the queue.");
                                   }
                               },error : function(error){
@@ -2894,13 +3121,13 @@ it("Should not getMessage message with the delay ",function(done){
           queue.addMessage("sample",{
                success : function(response){
                    if(response.id){
-                       //now delete the queue. 
+                       //now delete the queue.
                        queue.get({
                               success : function(response){
                                   if(response.id){
-                                        //getMessage message from the queue. 
+                                        //getMessage message from the queue.
                                        done();
-                                  }else{     
+                                  }else{
                                      done("Failed to get the queue.");
                                   }
                               },error : function(error){
@@ -2923,13 +3150,13 @@ it("Should not getMessage message with the delay ",function(done){
           queue.addMessage("sample",{
                success : function(response){
                    if(response.id){
-                       //now delete the queue. 
+                       //now delete the queue.
                        CB.CloudQueue.get(name,{
                               success : function(response){
                                   if(response.id){
-                                        //getMessage message from the queue. 
+                                        //getMessage message from the queue.
                                        done();
-                                  }else{     
+                                  }else{
                                      done("Failed to get the queue.");
                                   }
                               },error : function(error){
@@ -2945,7 +3172,7 @@ it("Should not getMessage message with the delay ",function(done){
           });
      });
 
-     
+
 
      it("Should not get the queue with null name", function(done){
           this.timeout(30000);
@@ -2955,13 +3182,13 @@ it("Should not getMessage message with the delay ",function(done){
                success : function(response){
                    if(response.id){
                     try{
-                       //now delete the queue. 
+                       //now delete the queue.
                        CB.CloudQueue.get(null,{
                               success : function(response){
                                   if(response.id){
-                                        //getMessage message from the queue. 
+                                        //getMessage message from the queue.
                                        done();
-                                  }else{     
+                                  }else{
                                      done("Failed to get the queue.");
                                   }
                               },error : function(error){
@@ -2984,7 +3211,7 @@ it("Should not getMessage message with the delay ",function(done){
 
      it("Should get All Queues", function(done){
           this.timeout(30000);
-          
+
           CB.CloudQueue.getAll({
                success : function(response){
                   if(response.length>0){
@@ -3109,7 +3336,7 @@ it("Should not getMessage message with the delay ",function(done){
                                           done(error);
                                      }
                                   });
-                                
+
                            }
                            else{
                                 done("added but incorrect data");
@@ -3132,7 +3359,7 @@ it("Should not getMessage message with the delay ",function(done){
             success : function(response){
                  if(response instanceof CB.QueueMessage && response.id){
                       if(response.message === 'sample'){
-                           //now change the type of the queue to addMessage. 
+                           //now change the type of the queue to addMessage.
                            queue.addSubscriber("https://www.google.com", {
                               success : function(){
                                    queue.type = "push";
@@ -3168,6 +3395,7 @@ it("Should not getMessage message with the delay ",function(done){
         CB.appKey = CB.jsKey;
      });
 });
+
 describe("Bulk API",function(done){
 
     it("should save array of CloudObject using bulk Api",function(done){
