@@ -16,7 +16,7 @@ runTests();
 //Ending
 app.set('port', process.env.PORT || 6000);
 var server = app.listen(app.get('port'), function() {	
-	console.log("Javascript SDK started on PORT:"+app.get('port'));
+	console.log("Javascript SDK's started on PORT:"+app.get('port'));
 });
 
 
